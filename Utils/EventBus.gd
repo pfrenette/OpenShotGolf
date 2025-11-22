@@ -1,0 +1,9 @@
+extends Node
+
+func register(node, event, callback):
+# warning-ignore:return_value_discarded
+	connect(event, node, callback)
+
+
+func call_event(event_name):
+	emit_signal(event_name)
