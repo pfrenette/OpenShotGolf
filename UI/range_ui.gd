@@ -5,7 +5,6 @@ signal club_selected(club: String)
 signal set_session(dir: String, player_name: String)
 
 signal hit_shot(data)
-signal set_env(data)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

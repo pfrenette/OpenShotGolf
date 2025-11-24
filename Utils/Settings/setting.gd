@@ -5,12 +5,12 @@ signal setting_changed(val)
 
 var value : Variant
 var default : Variant
-var _min : Variant = null
-var _max : Variant = null
+var min_value : Variant = null
+var max_value : Variant = null
 
 func _init(def: Variant, minimum: Variant = null, maximum: Variant = null):
-	_min = minimum
-	_max = maximum
+	min_value = minimum
+	max_value = maximum
 	value = def
 	default = def
 	
@@ -19,10 +19,10 @@ func reset_default():
 	emit_signal("setting_changed", value)
 
 func set_value(val: Variant):
-	if _min and value < _min:
-		value = _min
-	elif _max and value > _max:
-		value = _max
+	if min_value and value < min_value:
+		value = min_value
+	elif max_value and value > max_value:
+		value = max_value
 	else:
 		value = val
 		

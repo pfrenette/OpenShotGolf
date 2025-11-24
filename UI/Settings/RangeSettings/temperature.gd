@@ -3,8 +3,8 @@ extends HBoxContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$TemperatureSpinBox.min_value = GlobalSettings.range_settings.temperature._min
-	$TemperatureSpinBox.max_value = GlobalSettings.range_settings.temperature._max
+	$TemperatureSpinBox.min_value = GlobalSettings.range_settings.temperature.min_value
+	$TemperatureSpinBox.max_value = GlobalSettings.range_settings.temperature.max_value
 	$TemperatureSpinBox.value = GlobalSettings.range_settings.temperature.value
 	
 	$TemperatureSpinBox.step = 1.0

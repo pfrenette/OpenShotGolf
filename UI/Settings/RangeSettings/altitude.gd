@@ -3,8 +3,8 @@ extends HBoxContainer
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	$AltitudeSpinBox.min_value = GlobalSettings.range_settings.altitude._min
-	$AltitudeSpinBox.max_value = GlobalSettings.range_settings.altitude._max
+	$AltitudeSpinBox.min_value = GlobalSettings.range_settings.altitude.min_value
+	$AltitudeSpinBox.max_value = GlobalSettings.range_settings.altitude.max_value
 	$AltitudeSpinBox.value = GlobalSettings.range_settings.altitude.value
 	$AltitudeSpinBox.step = 10
 	
