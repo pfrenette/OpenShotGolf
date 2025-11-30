@@ -1,5 +1,6 @@
 extends Node
 
+@warning_ignore("unused_signal")
 signal club_selected(club_name: String)
 
 func register(node, event, callback):

@@ -49,7 +49,7 @@ func _on_tcp_client_hit_ball(data: Dictionary) -> void:
 func _on_golf_ball_rest(_ball_data) -> void:
 	if GlobalSettings.range_settings.auto_ball_reset.value:
 		await get_tree().create_timer(GlobalSettings.range_settings.ball_reset_timer.value).timeout
-		$GolfBall.reset_ball()
+		$Player.reset_ball()
 		ball_data["HLA"] = 0.0
 		ball_data["VLA"] = 0.0
 		
