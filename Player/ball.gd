@@ -17,8 +17,8 @@ var airDensity = Coefficients.get_air_density(0.0, temperature)
 var dynamicAirViscosity = Coefficients.get_dynamic_air_viscosity(temperature)
 var nu = 0.00001470 # Air Kinematic Viscosity
 var nu_g = 0.0005 # Grass drag viscosity; surface-driven
-var drag_cf := 1.2 # Drag correction factor
-var lift_cf := 1.2 # lift correction factor
+var drag_cf := 1.0 # Drag correction factor
+var lift_cf := 1.0 # lift correction factor
 var surface_type: int = Enums.Surface.FIRM
 
 var state : Enums.BallState = Enums.BallState.REST
