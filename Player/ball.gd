@@ -163,7 +163,7 @@ func _physics_process(delta: float) -> void:
 			floor_norm = normal
 
 			# Bounce if: first impact (FLIGHT) OR subsequent airborne landing
-			var is_landing = (state == Enums.BallState.FLIGHT) or (not was_on_ground and prev_velocity.y < -0.5)
+			var is_landing = (state == Enums.BallState.FLIGHT) or prev_velocity.y < -0.5
 
 			if is_landing:
 				if state == Enums.BallState.FLIGHT:
@@ -173,8 +173,7 @@ func _physics_process(delta: float) -> void:
 					print("  Spin at impact: ", omega, " (%.0f rpm)" % (omega.length()/0.10472))
 					print("  Normal: ", normal)
 				velocity = bounce(velocity, normal)
-				if state == Enums.BallState.ROLLOUT:
-					print("  Velocity after bounce: ", velocity, " (%.2f m/s)" % velocity.length())
+				print("  Velocity after bounce: ", velocity, " (%.2f m/s)" % velocity.length())
 				on_ground = false
 			else:
 				# On ground, not bouncing

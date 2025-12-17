@@ -59,13 +59,9 @@ static func get_Cl(Re: float, S: float) -> float:
 	if Re < 50000:
 		return 0.1
 
-	# Very high Reynolds number - use linear model to avoid extrapolation issues
-	if Re >= 200000:
-		return min(CL_MAX, max(0.05, ReHighToCl(S)))
-
 	# For Re > 75k, use ReHighToCl directly
 	if Re > 75000:
-		return min(CL_MAX, max(0.05, ReHighToCl(S)))
+		return clampf(ReHighToCl(S), 0.05, CL_MAX)
 
 	# Interpolation between polynomial models for 50k <= Re <= 75k
 	var Re_values: Array[int] = [50000, 60000, 65000, 70000, 75000]
