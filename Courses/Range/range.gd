@@ -53,7 +53,7 @@ func _on_tcp_client_hit_ball(data: Dictionary) -> void:
 
 func _process(_delta: float) -> void:
 	# Refresh UI during flight/rollout so carry/apex update live; distance updates only at rest.
-	if $Player.get_ball_state() != Enums.BallState.REST:
+	if $Player.get_ball_state() != GolfBall.BallState.REST:
 		_update_ball_display()
 
 
@@ -111,7 +111,7 @@ func reset_camera_to_start() -> void:
 	ball.position = ball_start
 	ball.velocity = Vector3.ZERO
 	ball.omega = Vector3.ZERO
-	ball.state = Enums.BallState.REST
+	ball.state = GolfBall.BallState.REST
 
 	# Keep follow mode disabled - it will re-enable when the next shot starts
 
