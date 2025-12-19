@@ -1,9 +1,5 @@
 extends Node3D
 
-
-const STANDARD_BALL_SCRIPT := preload("res://Player/ball.gd")
-const PREMIUM_BALL_SCRIPT := preload("res://Player/ball_premium.gd")
-
 var track_points : bool = false
 var trail_timer : float = 0.0
 var trail_resolution : float = 0.1
@@ -18,12 +14,19 @@ var tracers : Array = []
 var current_tracer : MeshInstance3D = null
 var BallTrailScript = preload("res://Player/ball_trail.gd")
 
+var ball : GolfBall = null
+
 signal good_data
 signal bad_data
 signal rest(data: Dictionary)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Create new golf ball
+	ball = GolfBall.new(GolfBall.BallType.STANDARD)
+	ball.position.y = 3.0
+	add_child(ball)
+	
 	# Set initial value and connect to setting changes
 	max_tracers = GlobalSettings.range_settings.shot_tracer_count.value
 	GlobalSettings.range_settings.shot_tracer_count.setting_changed.connect(_on_tracer_count_changed)
@@ -42,23 +45,7 @@ func _on_ball_type_changed(value) -> void:
 	_apply_ball_type(value)
 
 
-func _apply_ball_type(ball_type_value) -> void:
-	var ball := $Ball
-	var desired_script: Script = STANDARD_BALL_SCRIPT
-	if ball_type_value == GolfBall.BallType.PREMIUM:
-		desired_script = PREMIUM_BALL_SCRIPT
-
-	if ball.get_script() != desired_script:
-		ball.set_script(desired_script)
-	if ball.has_method("initialize_ball"):
-		ball.initialize_ball()
-
-	# Ensure connections remain intact if script swapped at runtime
-	if not ball.is_connected("rest", _on_ball_rest):
-		ball.rest.connect(_on_ball_rest)
-
-	# Re-apply surface/environment and reset to a clean state
-	ball.set_surface(GlobalSettings.range_settings.surface_type.value)
+func _apply_ball_type(_ball_type_value) -> void:
 	reset_ball()
 
 func create_new_tracer() -> MeshInstance3D:
@@ -88,13 +75,13 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("hit"):
 		track_points = false
 		create_new_tracer()
-		$Ball.call_deferred("hit")
+		ball.call_deferred("hit")
 		if current_tracer != null:
 			current_tracer.add_point(Vector3(0.0, 0.05, 0.0))
 		track_points = true
 		trail_timer = 0.0
 	if Input.is_action_just_pressed("reset"):
-		$Ball.call_deferred("reset")
+		ball.call_deferred("reset")
 		apex = 0.0
 		carry = 0.0
 		side_distance = 0.0
@@ -108,21 +95,21 @@ func _process(_delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if track_points and current_tracer != null:
-		apex = max(apex, $Ball.position.y)
-		side_distance = $Ball.position.z
-		if $Ball.state == GolfBall.BallState.FLIGHT:
-			carry = $Ball.get_downrange_yards() / 1.09361  # Convert yards back to meters for consistency
+		apex = max(apex, ball.position.y)
+		side_distance = ball.position.z
+		if ball.state == GolfBall.BallState.FLIGHT:
+			carry = ball.get_downrange_yards() / 1.09361  # Convert yards back to meters for consistency
 		trail_timer += delta
 		if trail_timer >= trail_resolution:
-			current_tracer.add_point($Ball.position)
+			current_tracer.add_point(ball.position)
 			trail_timer = 0.0
 
 func get_distance() -> int:
 	# Returns the downrange distance in meters
-	return int($Ball.get_downrange_yards() / 1.09361)
+	return int(ball.get_downrange_yards() / 1.09361)
 	
 func get_side_distance() -> int:
-	return int($Ball.position.z)
+	return int(ball.position.z)
 
 func validate_data(data: Dictionary) -> bool:
 	# TODO: implement data validation
@@ -133,7 +120,7 @@ func validate_data(data: Dictionary) -> bool:
 
 
 func reset_ball():
-	$Ball.call_deferred("reset")
+	ball.call_deferred("reset")
 	# Clear all tracers
 	for tracer in tracers:
 		tracer.queue_free()
@@ -151,7 +138,7 @@ func reset_shot_data() -> void:
 
 func _on_ball_rest() -> void:
 	track_points = false
-	shot_data["TotalDistance"] = int($Ball.get_downrange_yards() / 1.09361)  # Downrange distance in meters
+	shot_data["TotalDistance"] = int(ball.get_downrange_yards() / 1.09361)  # Downrange distance in meters
 	shot_data["CarryDistance"] = int(carry)
 	shot_data["Apex"] = int(apex)
 	shot_data["SideDistance"] = int(side_distance)
@@ -159,7 +146,7 @@ func _on_ball_rest() -> void:
 
 
 func get_ball_state():
-	return $Ball.state
+	return ball.state
 
 
 func _on_tcp_client_hit_ball(data: Dictionary) -> void:
@@ -177,7 +164,7 @@ func _on_tcp_client_hit_ball(data: Dictionary) -> void:
 	carry = 0.0
 	side_distance = 0.0
 	create_new_tracer()
-	$Ball.call_deferred("hit_from_data", data)
+	ball.call_deferred("hit_from_data", data)
 	if current_tracer != null:
 		current_tracer.add_point(Vector3(0.0, 0.05, 0.0))
 	track_points = true
@@ -193,7 +180,7 @@ func _on_range_ui_hit_shot(data: Variant) -> void:
 	carry = 0.0
 	side_distance = 0.0
 	create_new_tracer()
-	$Ball.call_deferred("hit_from_data", data)
+	ball.call_deferred("hit_from_data", data)
 	if current_tracer != null:
 		current_tracer.add_point(Vector3(0.0, 0.05, 0.0))
 	track_points = true
@@ -201,4 +188,4 @@ func _on_range_ui_hit_shot(data: Variant) -> void:
 	
 
 func _on_range_ui_set_env(data: Variant) -> void:
-	$Ball.call_deferred("set_env", data)
+	ball.call_deferred("set_env", data)

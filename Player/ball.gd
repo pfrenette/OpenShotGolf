@@ -8,6 +8,8 @@ enum BallType {STANDARD, PREMIUM}
 
 const START_HEIGHT := 0.02
 
+var ball_scene : PackedScene = preload("res://assets/models/balls/golf_ball.glb")
+
 var state: GolfBall.BallState = GolfBall.BallState.REST
 var omega := Vector3.ZERO  # Angular velocity (rad/s)
 var on_ground := false
@@ -42,8 +44,15 @@ var shot_dir := Vector3(1.0, 0.0, 0.0)  # Normalized horizontal direction
 var launch_spin_rpm := 0.0  # Stored for bounce calculations
 
 
+func _init(ball_type := BallType.STANDARD):
+	if ball_type == BallType.PREMIUM:
+		_drag_mult = 0.9
+		_lift_mult = 1.1
+
+
 func _ready() -> void:
 	initialize_ball()
+	_create_collision_and_model()
 
 
 func initialize_ball() -> void:
@@ -51,6 +60,19 @@ func initialize_ball() -> void:
 	_update_environment()
 	set_surface(GlobalSettings.range_settings.surface_type.value)
 
+
+func _create_collision_and_model():
+	# Create collision shape
+	var collision = CollisionShape3D.new()
+	var shape = SphereShape3D.new()
+	shape.set_radius(BallPhysics.RADIUS*2)
+	collision.set_shape(shape)
+	add_child(collision)
+	# Create model
+	var mesh = ball_scene.instantiate()
+	var mesh_scale := 0.05
+	mesh.scale = Vector3(mesh_scale, mesh_scale, mesh_scale)
+	add_child(mesh)
 
 func _connect_settings() -> void:
 	var settings := GlobalSettings.range_settings
@@ -61,9 +83,18 @@ func _connect_settings() -> void:
 		settings.altitude.setting_changed.connect(_on_environment_changed)
 	if not settings.range_units.setting_changed.is_connected(_on_environment_changed):
 		settings.range_units.setting_changed.connect(_on_environment_changed)
+	settings.ball_type.setting_changed.connect(_ball_type_changed)
 	_drag_scale = _drag_mult
 	_lift_scale = _lift_mult
 	_settings_connected = true
+
+func _ball_type_changed(value):
+	if value == BallType.PREMIUM:
+		_drag_mult = 0.9
+		_lift_mult = 1.1
+	else:
+		_drag_mult = 1.0
+		_lift_mult = 1.0
 
 
 func _on_environment_changed(_value) -> void:

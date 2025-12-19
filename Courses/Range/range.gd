@@ -24,9 +24,7 @@ var last_display: Dictionary = {}
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	GlobalSettings.range_settings.camera_follow_mode.setting_changed.connect(set_camera_follow_mode)
-	GlobalSettings.range_settings.surface_type.setting_changed.connect(_on_surface_changed)
 	set_camera_follow_mode(GlobalSettings.range_settings.camera_follow_mode.value)
-	_apply_surface_to_ball()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -73,7 +71,7 @@ func _on_golf_ball_rest(_ball_data) -> void:
 func set_camera_follow_mode(value) -> void:
 	if value:
 		$PhantomCamera3D.follow_mode = PhantomCamera3D.FollowMode.FRAMED
-		$PhantomCamera3D.follow_target = $Player/Ball
+		$PhantomCamera3D.follow_target = $Player.ball
 	else:
 		$PhantomCamera3D.follow_mode = PhantomCamera3D.FollowMode.NONE
 
@@ -91,10 +89,10 @@ func reset_camera_to_start() -> void:
 	await tween.finished
 
 	# Reset ball to starting position so it's visible for next shot
-	$Player/Ball.position = Vector3(0.0, 0.05, 0.0)
-	$Player/Ball.velocity = Vector3.ZERO
-	$Player/Ball.omega = Vector3.ZERO
-	$Player/Ball.state = Enums.BallState.REST
+	$Player.ball.position = Vector3(0.0, 0.2, 0.0)
+	$Player.ball.velocity = Vector3.ZERO
+	$Player.ball.omega = Vector3.ZERO
+	$Player.ball.state = GolfBall.BallState.REST
 
 	# Keep follow mode disabled - it will re-enable when the next shot starts
 
@@ -108,15 +106,6 @@ func _on_range_ui_hit_shot(data: Dictionary) -> void:
 	if GlobalSettings.range_settings.camera_follow_mode.value:
 		set_camera_follow_mode(true)
 
-
-func _apply_surface_to_ball() -> void:
-	if $Player.has_node("Ball"):
-		$Player/Ball.set_surface(GlobalSettings.range_settings.surface_type.value)
-
-
-func _on_surface_changed(value) -> void:
-	if $Player.has_node("Ball"):
-		$Player/Ball.set_surface(value)
 
 
 func _reset_display_data() -> void:
