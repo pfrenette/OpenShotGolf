@@ -194,11 +194,18 @@ offset_bottom = 150.0
 rotation = -0.0004276121
 
 [node name="ShotInjector" type="VBoxContainer" parent="."]
-visible = false
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 4
 script = ExtResource("6_j5yvw")
+
+[node name="PayloadLabel" type="Label" parent="ShotInjector"]
+layout_mode = 2
+text = "Test Payload"
+
+[node name="PayloadOption" type="OptionButton" parent="ShotInjector"]
+visible = false
+layout_mode = 2
 
 [node name="Speed" type="Label" parent="ShotInjector"]
 layout_mode = 2
@@ -249,13 +256,6 @@ value = 12.0
 layout_mode = 2
 text = "Hit Shot"
 
-[node name="PayloadLabel" type="Label" parent="ShotInjector"]
-layout_mode = 2
-text = "Test Payload"
-
-[node name="PayloadOption" type="OptionButton" parent="ShotInjector"]
-layout_mode = 2
-
 [connection signal="pressed" from="HBoxContainer/RecButton" to="." method="_on_rec_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/SettingsButton" to="SettingsLayer/Container/RangeSettings" method="_on_settings_button_pressed"]
 [connection signal="gui_input" from="SettingsLayer/Background" to="SettingsLayer/Container/RangeSettings" method="_on_background_clicked"]
@@ -285,5 +285,5 @@ layout_mode = 2
 [connection signal="drag_ended" from="GridCanvas/SpinAxis" to="GridCanvas" method="_on_panel_drag_ended"]
 [connection signal="drag_started" from="GridCanvas/SpinAxis" to="GridCanvas" method="_on_panel_drag_started"]
 [connection signal="inject" from="ShotInjector" to="." method="_on_shot_injector_inject"]
-[connection signal="pressed" from="ShotInjector/Button" to="ShotInjector" method="_on_button_pressed"]
 [connection signal="item_selected" from="ShotInjector/PayloadOption" to="ShotInjector" method="_on_payload_option_item_selected"]
+[connection signal="pressed" from="ShotInjector/Button" to="ShotInjector" method="_on_button_pressed"]

@@ -9,6 +9,7 @@ signal inject(data)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_populate_payloads()
+	_apply_payload(default_payload_path)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -39,31 +40,33 @@ func _populate_payloads() -> void:
 	payload_option.select(selected)
 
 
+func _apply_payload(_payload_path: String) -> void:
+	var file := FileAccess.open(_payload_path, FileAccess.READ)
+	if file:
+		var json_text := file.get_as_text()
+		var json := JSON.new()
+		if json.parse(json_text) == OK:
+			var parsed = json.data
+			if parsed.has("BallData"):
+				var data = parsed["BallData"].duplicate()
+				$SpeedSpinBox.value = float(data["Speed"])
+				$SpinAxisSpinBox.value = float(data["SpinAxis"])
+				$TotalSpinSpinBox.value = float(data["TotalSpin"])
+				$HLASpinBox.value = float(data["HLA"])
+				$VLASpinBox.value = float(data["VLA"])
+				
+
 func _on_button_pressed() -> void:
-	# Collect data from boxes and send to be hit. If empty, fall back to default JSON payload.
-	var data := {}
-	var loaded := false
-	if default_payload_path != "":
-		var file := FileAccess.open(default_payload_path, FileAccess.READ)
-		if file:
-			var json_text := file.get_as_text()
-			var json := JSON.new()
-			if json.parse(json_text) == OK:
-				var parsed = json.data
-				if parsed.has("BallData"):
-					data = parsed["BallData"].duplicate()
-					loaded = true
-	
 	# Inject the spinboxes values within the shot data
+	var data := {}
 	data["Speed"] = $SpeedSpinBox.value
 	data["SpinAxis"] = $SpinAxisSpinBox.value
 	data["TotalSpin"] = $TotalSpinSpinBox.value
 	data["HLA"] = $HLASpinBox.value
 	data["VLA"] = $VLASpinBox.value
 	
-	# Override with UI entries when provided
 	# [pfrenette] What should be done with these two? 
-	# I assume there is a conversion possible from SpinAxis/TotalSpin and Back/SideSpin?
+	# Is there a conversion possible from SpinAxis/TotalSpin and Back/SideSpin?
 	#if has_node("BackSpinText"):
 	#	var back_node = $BackSpinText
 	#	if back_node.text.strip_edges() != "":
@@ -73,11 +76,6 @@ func _on_button_pressed() -> void:
 	#	if side_node.text.strip_edges() != "":
 	#		data["SideSpin"] = float(side_node.text)
 	
-	if data.is_empty():
-		print("Shot injector: no data provided and default payload missing; using zeros")
-	
-	if loaded:
-		print("Shot injector: loaded default payload from ", default_payload_path)
 	print("Local shot injection payload: ", JSON.stringify(data))
 	
 	emit_signal("inject", data)
@@ -86,4 +84,4 @@ func _on_button_pressed() -> void:
 func _on_payload_option_item_selected(index: int) -> void:
 	var metadata = payload_option.get_item_metadata(index)
 	if typeof(metadata) == TYPE_STRING:
-		default_payload_path = metadata
+		_apply_payload(metadata)
