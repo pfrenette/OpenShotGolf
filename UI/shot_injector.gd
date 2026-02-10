@@ -9,6 +9,7 @@ signal inject(data)
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	_populate_payloads()
+	_apply_payload(default_payload_path)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -39,46 +40,31 @@ func _populate_payloads() -> void:
 	payload_option.select(selected)
 
 
+func _apply_payload(_payload_path: String) -> void:
+	var file := FileAccess.open(_payload_path, FileAccess.READ)
+	if file:
+		var json_text := file.get_as_text()
+		var json := JSON.new()
+		if json.parse(json_text) == OK:
+			var parsed = json.data
+			if parsed.has("BallData"):
+				var data = parsed["BallData"].duplicate()
+				$SpeedSpinBox.value = float(data["Speed"])
+				$SpinAxisSpinBox.value = float(data["SpinAxis"])
+				$TotalSpinSpinBox.value = float(data["TotalSpin"])
+				$HLASpinBox.value = float(data["HLA"])
+				$VLASpinBox.value = float(data["VLA"])
+				
+
 func _on_button_pressed() -> void:
-	# Collect data from boxes and send to be hit. If empty, fall back to default JSON payload.
+	# Inject the spinboxes values within the shot data
 	var data := {}
-	var loaded := false
-	if default_payload_path != "":
-		var file := FileAccess.open(default_payload_path, FileAccess.READ)
-		if file:
-			var json_text := file.get_as_text()
-			var json := JSON.new()
-			if json.parse(json_text) == OK:
-				var parsed = json.data
-				if parsed.has("BallData"):
-					data = parsed["BallData"].duplicate()
-					loaded = true
+	data["Speed"] = $SpeedSpinBox.value
+	data["SpinAxis"] = $SpinAxisSpinBox.value
+	data["TotalSpin"] = $TotalSpinSpinBox.value
+	data["HLA"] = $HLASpinBox.value
+	data["VLA"] = $VLASpinBox.value
 	
-	# Override with UI entries when provided
-	if $SpeedText.text.strip_edges() != "":
-		data["Speed"] = float($SpeedText.text)
-	if $SpinAxisText.text.strip_edges() != "":
-		data["SpinAxis"] = float($SpinAxisText.text)
-	if $TotalSpinText.text.strip_edges() != "":
-		data["TotalSpin"] = float($TotalSpinText.text)
-	if $HLAText.text.strip_edges() != "":
-		data["HLA"] = float($HLAText.text)
-	if $VLAText.text.strip_edges() != "":
-		data["VLA"] = float($VLAText.text)
-	if has_node("BackSpinText"):
-		var back_node = $BackSpinText
-		if back_node.text.strip_edges() != "":
-			data["BackSpin"] = float(back_node.text)
-	if has_node("SideSpinText"):
-		var side_node = $SideSpinText
-		if side_node.text.strip_edges() != "":
-			data["SideSpin"] = float(side_node.text)
-	
-	if data.is_empty():
-		print("Shot injector: no data provided and default payload missing; using zeros")
-	
-	if loaded:
-		print("Shot injector: loaded default payload from ", default_payload_path)
 	print("Local shot injection payload: ", JSON.stringify(data))
 	
 	emit_signal("inject", data)
@@ -87,4 +73,4 @@ func _on_button_pressed() -> void:
 func _on_payload_option_item_selected(index: int) -> void:
 	var metadata = payload_option.get_item_metadata(index)
 	if typeof(metadata) == TYPE_STRING:
-		default_payload_path = metadata
+		_apply_payload(metadata)

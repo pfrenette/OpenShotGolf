@@ -200,61 +200,65 @@ size_flags_horizontal = 8
 size_flags_vertical = 4
 script = ExtResource("6_j5yvw")
 
-[node name="Speed" type="Label" parent="ShotInjector"]
-layout_mode = 2
-text = "Speed"
-
-[node name="SpeedText" type="TextEdit" parent="ShotInjector"]
-custom_minimum_size = Vector2(0, 35)
-layout_mode = 2
-placeholder_text = "0.0"
-
-[node name="SpinAxis" type="Label" parent="ShotInjector"]
-layout_mode = 2
-text = "SpinAxis"
-
-[node name="SpinAxisText" type="TextEdit" parent="ShotInjector"]
-custom_minimum_size = Vector2(0, 35)
-layout_mode = 2
-placeholder_text = "0.0"
-
-[node name="TotalSpin" type="Label" parent="ShotInjector"]
-layout_mode = 2
-text = "Total Spin"
-
-[node name="TotalSpinText" type="TextEdit" parent="ShotInjector"]
-custom_minimum_size = Vector2(0, 35)
-layout_mode = 2
-placeholder_text = "0.0"
-
-[node name="HLA" type="Label" parent="ShotInjector"]
-layout_mode = 2
-text = "HLA"
-
-[node name="HLAText" type="TextEdit" parent="ShotInjector"]
-custom_minimum_size = Vector2(0, 35)
-layout_mode = 2
-placeholder_text = "0.0"
-
-[node name="VLA" type="Label" parent="ShotInjector"]
-layout_mode = 2
-text = "VLA"
-
-[node name="VLAText" type="TextEdit" parent="ShotInjector"]
-custom_minimum_size = Vector2(0, 35)
-layout_mode = 2
-placeholder_text = "0.0"
-
-[node name="Button" type="Button" parent="ShotInjector"]
-layout_mode = 2
-text = "Hit Shot"
-
 [node name="PayloadLabel" type="Label" parent="ShotInjector"]
 layout_mode = 2
 text = "Test Payload"
 
 [node name="PayloadOption" type="OptionButton" parent="ShotInjector"]
 layout_mode = 2
+
+[node name="Speed" type="Label" parent="ShotInjector"]
+layout_mode = 2
+text = "Speed"
+
+[node name="SpeedSpinBox" type="SpinBox" parent="ShotInjector"]
+layout_mode = 2
+max_value = 250.0
+value = 150.0
+
+[node name="SpinAxis" type="Label" parent="ShotInjector"]
+layout_mode = 2
+text = "SpinAxis"
+
+[node name="SpinAxisSpinBox" type="SpinBox" parent="ShotInjector"]
+layout_mode = 2
+min_value = -25.0
+max_value = 25.0
+step = 0.5
+
+[node name="TotalSpin" type="Label" parent="ShotInjector"]
+layout_mode = 2
+text = "Total Spin"
+
+[node name="TotalSpinSpinBox" type="SpinBox" parent="ShotInjector"]
+layout_mode = 2
+max_value = 12000.0
+step = 50.0
+value = 6000.0
+
+[node name="HLA" type="Label" parent="ShotInjector"]
+layout_mode = 2
+text = "HLA"
+
+[node name="HLASpinBox" type="SpinBox" parent="ShotInjector"]
+layout_mode = 2
+min_value = -45.0
+max_value = 45.0
+step = 0.5
+
+[node name="VLA" type="Label" parent="ShotInjector"]
+layout_mode = 2
+text = "VLA"
+
+[node name="VLASpinBox" type="SpinBox" parent="ShotInjector"]
+layout_mode = 2
+max_value = 90.0
+step = 0.5
+value = 12.0
+
+[node name="Button" type="Button" parent="ShotInjector"]
+layout_mode = 2
+text = "Hit Shot"
 
 [connection signal="pressed" from="HBoxContainer/RecButton" to="." method="_on_rec_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/SettingsButton" to="SettingsLayer/Container/RangeSettings" method="_on_settings_button_pressed"]
@@ -285,5 +289,5 @@ layout_mode = 2
 [connection signal="drag_ended" from="GridCanvas/SpinAxis" to="GridCanvas" method="_on_panel_drag_ended"]
 [connection signal="drag_started" from="GridCanvas/SpinAxis" to="GridCanvas" method="_on_panel_drag_started"]
 [connection signal="inject" from="ShotInjector" to="." method="_on_shot_injector_inject"]
-[connection signal="pressed" from="ShotInjector/Button" to="ShotInjector" method="_on_button_pressed"]
 [connection signal="item_selected" from="ShotInjector/PayloadOption" to="ShotInjector" method="_on_payload_option_item_selected"]
+[connection signal="pressed" from="ShotInjector/Button" to="ShotInjector" method="_on_button_pressed"]
